@@ -136,7 +136,7 @@ rdd2
 rdd2.collect()  # view the content
 
 #从 CSV 文件加载数据
-df = spark.read.load("Data/Advertising.csv", format="csv", inferSchema="true", header="true")
+df = spark.read.load("/users/acw24yz/com6012/ScalableML/Data/Advertising.csv", format="csv", inferSchema="true", header="true")
 df.show(5)  # show the top 5 rows
 
 #CSV 文件是半结构化数据，因此spark自动推断了方案。
@@ -147,3 +147,128 @@ df2.printSchema()
 
 #使用 .describe（）.show（） 获取数字列的摘要统计数据
 df2.describe().show()
+
+
+
+#---
+# 3. 机器学习库和管道
+
+# 将数据转换为密集向量（特征和标签）（feature， label）
+from pyspark.sql import Row
+from pyspark.ml.linalg import Vectors
+def transData(data):
+    return data.rdd.map(lambda r: [Vectors.dense(r[:-1]),r[-1]]).toDF(['features','label'])
+
+transformed= transData(df2)
+transformed.show(5)
+# 这里的标签是实数，这是一个回归问题。
+#     对于分类问题，您可能需要使用 featureIndexer
+#     将标签（例如，disease、healthy）转换为索引
+
+# 将数据拆分为训练集和测试集（40% 留作测试）
+(trainingData, testData) = transformed.randomSplit([0.6, 0.4], 6012)
+# 6012 表示 seed=6012
+
+# 按如下方式检查您的训练和测试数据
+trainingData.show(5)
+testData.show(5)
+
+# 拟合线性回归模型并执行预测
+from pyspark.ml.regression import LinearRegression
+lr = LinearRegression()
+lrModel = lr.fit(trainingData)
+predictions = lrModel.transform(testData)
+predictions.show(5)
+
+# 评估
+from pyspark.ml.evaluation import RegressionEvaluator
+evaluator = RegressionEvaluator(labelCol="label",predictionCol="prediction",metricName="rmse")
+rmse = evaluator.evaluate(predictions)
+print("Root Mean Squared Error (RMSE) on test data = %g" % rmse)
+#代码应当输出RMSE（均方根误差）
+
+
+#---
+# 示例：用于文档分类的机器学习管道
+from pyspark.ml import Pipeline
+from pyspark.ml.classification import LogisticRegression
+from pyspark.ml.feature import HashingTF, Tokenizer
+# 直接创建 DataFrame（用于说明）
+training = spark.createDataFrame([
+    (0, "a b c d e spark 6012", 1.0),
+    (1, "b d", 0.0),
+    (2, "spark f g h 6012", 1.0),
+    (3, "hadoop mapreduce", 0.0)
+], ["id", "text", "label"])
+
+training.printSchema()
+training.show()
+
+#配置 ML 管道，该管道由三个阶段组成：tokenizer、hashingTF 和 lr
+tokenizer = Tokenizer(inputCol="text", outputCol="words")
+hashingTF = HashingTF(inputCol=tokenizer.getOutputCol(), outputCol="features")
+lr = LogisticRegression(maxIter=10, regParam=0.001)
+pipeline = Pipeline(stages=[tokenizer, hashingTF, lr])
+
+# 模型拟合
+model = pipeline.fit(training)
+
+# 构造测试文档 （data），这些文档是未标记的 （id， text） 元组
+test = spark.createDataFrame([
+    (4, "spark i j 6012"),
+    (5, "l m n"),
+    (6, "spark 6012 spark"),
+    (7, "apache hadoop")
+], ["id", "text"])
+
+test.show()
+
+# 对测试文档进行预测并打印感兴趣的列
+prediction = model.transform(test)
+prediction.show()
+
+selected = prediction.select("id", "text", "probability", "prediction")
+selected.show()
+
+for row in selected.collect():
+    rid, text, prob, prediction = row
+    print("(%d, %s) --> prob=%s, prediction=%f" % (rid, text, str(prob), prediction))
+
+
+
+
+# 4. 练习
+# 从本实验开始，您需要使用尽可能多的 DataFrame 函数
+
+# 4.1 日志挖掘
+# 在 HPC 上，通过Data下载NASA访问日志到目录
+wget ftp://ita.ee.lbl.gov/html/contrib/NASA-HTTP.html
+# 在实验室 1 中加载 Aug95 NASA 访问日志数据，
+# 并根据下载的 html 文件中的描述指定架构，
+# 创建一个包含五列的DataFrame。
+# 使用此 DataFrame 回答以下问题。
+    # 找出总的独立主机数量（即 1995 年 8 月）？
+    # 找出最频繁的访客，即访问次数最多的主机。
+
+# 4.2 广告的线性回归
+#     将正则化添加到广告示例的线性回归中，
+#     并根据没有任何正则化的效果评估预测效果。
+#     研究至少三种不同的正则化设置。
+
+# 4.3 文档分类的 Logistic 回归
+# 使用三个测试文档样本`"pyspark hadoop"`; `"spark a b c"`; `"mapreduce spark"`
+# 为【文档分类示例的机器学习管道】构建另一个测试数据集;
+# 并报告这三个样本的预测概率和预测标签。
+
+
+
+#---
+# 探索
+
+# π估计
+# 将分区数量更改为一个值范围（例如 2、4、8、16 等），
+# 并研究每个值的时间成本（例如，通过将时间成本与分区数量绘制成图表）。
+# 更改样本数以研究精密度和时间成本的变化。
+
+# 日志挖掘和机器学习
+# 找出回复字节大小的平均值和标准差
