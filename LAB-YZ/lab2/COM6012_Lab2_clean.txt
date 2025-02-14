@@ -1,0 +1,130 @@
+25/02/14 08:14:55 WARN NativeCodeLoader: Unable to load native-hadoop library for your platform... using builtin-java classes where applicable
+
+LAB2_01_NASA_Log_Mining
+
+show 'host, timestamp, request, status, bytes' schema: 
++-----------------+---------------------+-------+------+-----+
+|host             |timestamp            |request|status|bytes|
++-----------------+---------------------+-------+------+-----+
+|in24.inetnebr.com|[01/Aug/1995:00:00:01|-0400] |NULL  |200  |
+|uplherc.upl.com  |[01/Aug/1995:00:00:07|-0400] |NULL  |304  |
+|uplherc.upl.com  |[01/Aug/1995:00:00:08|-0400] |NULL  |304  |
+|uplherc.upl.com  |[01/Aug/1995:00:00:08|-0400] |NULL  |304  |
+|uplherc.upl.com  |[01/Aug/1995:00:00:08|-0400] |NULL  |304  |
++-----------------+---------------------+-------+------+-----+
+only showing top 5 rows
+
+
+ Part 1 Log mining: 
+
+Total unique hosts in August 1995: 75060
+
+most frequent visitor: 
++------------------+-----+
+|              host|count|
++------------------+-----+
+|edams.ksc.nasa.gov| 6530|
++------------------+-----+
+
+25/02/14 08:15:09 WARN NativeCodeLoader: Unable to load native-hadoop library for your platform... using builtin-java classes where applicable
+LAB2_02_AD_LR Spark session started.
+
+Training No Regularization Model
+25/02/14 08:15:15 WARN Instrumentation: [f454f969] regParam is zero, which might cause numerical instability and overfitting.
+25/02/14 08:15:15 WARN InstanceBuilder: Failed to load implementation from:dev.ludovic.netlib.blas.JNIBLAS
+25/02/14 08:15:15 WARN InstanceBuilder: Failed to load implementation from:dev.ludovic.netlib.blas.VectorBLAS
+25/02/14 08:15:16 WARN InstanceBuilder: Failed to load implementation from:dev.ludovic.netlib.lapack.JNILAPACK
+Training No Regularization Model successfully
+
+Training L2 Reg(Ridge) Model
+Training L2 Reg(Ridge) Model successfully
+
+Training L1 Reg(Lasso) Model
+Training L1 Reg(Lasso) Model successfully
+
+Training Mixed Reg(Elastic Net) Model
+Training Mixed Reg(Elastic Net) Model successfully
+
+Training L2 Reg-enhanced Model
+Training L2 Reg-enhanced Model successfully
+
+Training L1 Reg-enhanced Model
+Training L1 Reg-enhanced Model successfully
+
+Training Mixed Reg-enhanced Model
+Training Mixed Reg-enhanced Model successfully
+
+Evaluating No Regularization Model
+Evaluating No Regularization Model successfully
+
+Evaluating L2 Reg(Ridge) Model
+Evaluating L2 Reg(Ridge) Model successfully
+
+Evaluating L1 Reg(Lasso) Model
+Evaluating L1 Reg(Lasso) Model successfully
+
+Evaluating Mixed Reg(Elastic Net) Model
+Evaluating Mixed Reg(Elastic Net) Model successfully
+
+Evaluating L2 Reg-enhanced Model
+Evaluating L2 Reg-enhanced Model successfully
+
+Evaluating L1 Reg-enhanced Model
+Evaluating L1 Reg-enhanced Model successfully
+
+Evaluating Mixed Reg-enhanced Model
+Evaluating Mixed Reg-enhanced Model successfully
+
+ No Regularization - RMSE: 1.8713
+
+ L2 Reg(Ridge) - RMSE: 1.8762
+
+ L1 Reg(Lasso) - RMSE: 1.8792
+
+ Mixed Reg(Elastic Net) - RMSE: 1.8773
+
+ L2 Reg-enhanced - RMSE: 1.9304
+
+ L1 Reg-enhanced - RMSE: 2.0048
+
+ Mixed Reg-enhanced - RMSE: 1.9634
++--------------------+------------------+----+
+|               Model|              RMSE|Rank|
++--------------------+------------------+----+
+|   No Regularization|1.8712540609481094|   1|
+|       L2 Reg(Ridge)|1.8761918076140658|   2|
+|Mixed Reg(Elastic...| 1.877328568098719|   3|
+|       L1 Reg(Lasso)|1.8792320388274202|   4|
+|     L2 Reg-enhanced|1.9304079009838906|   5|
+|  Mixed Reg-enhanced| 1.963411276287828|   6|
+|     L1 Reg-enhanced| 2.004766691179923|   7|
++--------------------+------------------+----+
+
+25/02/14 08:15:25 WARN NativeCodeLoader: Unable to load native-hadoop library for your platform... using builtin-java classes where applicable
+
+LAB2_03_ppline
+25/02/14 08:15:32 WARN InstanceBuilder: Failed to load implementation from:dev.ludovic.netlib.blas.JNIBLAS
+25/02/14 08:15:32 WARN InstanceBuilder: Failed to load implementation from:dev.ludovic.netlib.blas.VectorBLAS
+
+show new test set: 
++---+---------------+
+| id|           text|
++---+---------------+
+|  4| pyspark hadoop|
+|  5|    spark a b c|
+|  6|mapreduce spark|
++---+---------------+
+
+
+show new prediction: 
++---+---------------+--------------------+----------+
+| id|           text|         probability|prediction|
++---+---------------+--------------------+----------+
+|  4| pyspark hadoop|[0.99700523688305...|       0.0|
+|  5|    spark a b c|[0.14869433732036...|       1.0|
+|  6|mapreduce spark|[0.94860129935421...|       0.0|
++---+---------------+--------------------+----------+
+
+(4, pyspark hadoop) --> prob=[0.9970052368830581,0.002994763116941912], prediction=0.000000
+(5, spark a b c) --> prob=[0.14869433732036,0.85130566267964], prediction=1.000000
+(6, mapreduce spark) --> prob=[0.9486012993542122,0.051398700645787776], prediction=0.000000
