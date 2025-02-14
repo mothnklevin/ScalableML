@@ -250,6 +250,62 @@ wget ftp://ita.ee.lbl.gov/html/contrib/NASA-HTTP.html
     # 找出总的独立主机数量（即 1995 年 8 月）？
     # 找出最频繁的访客，即访问次数最多的主机。
 
+# 下载 NASA 访问日志数据的描述文件
+wget ftp://ita.ee.lbl.gov/html/contrib/NASA-HTTP.html -P Data/
+# -P Data/ 指定下载后存放的位置
+
+#NASA 访问日志文件的每一行格式如下：
+# host logname user [time] "request" status bytes
+# 需要用到的字段：
+# host [time] "request" status bytes
+
+# 使用 PySpark 解析日志
+from pyspark.sql import SparkSession
+from pyspark.sql.types import StructType, StructField, StringType, IntegerType
+from pyspark.sql.functions import col
+
+# 创建 Spark 会话
+spark = SparkSession.builder.appName("NASA Log Mining").getOrCreate()
+
+# 定义日志数据的 Schema
+log_schema = StructType([
+    StructField("host", StringType(), True),      # 访问主机
+    StructField("logname", StringType(), True),   # logname（一般是 "-"，可忽略）
+    StructField("user", StringType(), True),      # user（一般是 "-"，可忽略）
+    StructField("timestamp", StringType(), True), # 访问时间
+    StructField("request", StringType(), True),   # HTTP 请求
+    StructField("status", IntegerType(), True),   # HTTP 状态码
+    StructField("bytes", StringType(), True)      # 返回的字节数（可能是 "-"）
+])
+
+# 读取 NASA 日志数据
+df = spark.read \
+    .option("delimiter", " ") \
+    .schema(log_schema) \
+    .csv("Data/NASA_access_log_Aug95.gz")
+# 仅保留 5 个有用的字段
+df = df.select("host", "timestamp", "request", "status", "bytes")
+# 显示前 5 行数据
+df.show(5, truncate=False)
+
+# 计算唯一主机数
+unique_hosts = df.select("host").distinct().count()
+print(f"Total unique hosts in August 1995: {unique_hosts}")
+# distinct() 获取 host 的唯一值。
+# count() 统计总数。
+
+
+# 计算访问次数最多的主机
+from pyspark.sql.functions import desc
+# 统计每个 host 的访问次数，并排序
+most_frequent_visitor = df.groupBy("host").count().orderBy(desc("count")).limit(1)
+most_frequent_visitor.show()
+# groupBy("host").count() 统计每个 host 访问次数。
+# orderBy(desc("count")) 按访问次数降序排列。
+# limit(1) 取访问次数最多的主机。
+
+
+
 # 4.2 广告的线性回归
 #     将正则化添加到广告示例的线性回归中，
 #     并根据没有任何正则化的效果评估预测效果。
