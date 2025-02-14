@@ -130,6 +130,7 @@ module load Anaconda3/2022.05
 
 source activate myspark
 
+#交互式处理
 spark-submit ./LogAnalysis01.py
 
 

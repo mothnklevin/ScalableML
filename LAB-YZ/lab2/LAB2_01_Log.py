@@ -7,7 +7,7 @@ from pyspark.sql.functions import desc
 # create Spark session
 spark = SparkSession.builder.appName("LAB2_01_NASA_Log_Mining").getOrCreate()
 
-print("LAB2_01_NASA_Log_Mining")
+print("\nLAB2_01_NASA_Log_Mining")
 
 # def csv Schema
 # StructType([StructField("name", DataType, nullable)])
@@ -34,8 +34,8 @@ df = spark.read \
 #  select useful 5 columns
 df = df.select("host", "timestamp", "request", "status", "bytes")
 # show first 5 column to check data
+print("\nshow 'host, timestamp, request, status, bytes' schema: ")
 df.show(5, truncate=False)
-
 
 
 print("\n Part 1 Log mining: ")
@@ -43,13 +43,14 @@ print("\n Part 1 Log mining: ")
 unique_hosts = df.select("host")\
     .distinct()\
     .count()
-print(f"Total unique hosts in August 1995: {unique_hosts}")
+print(f"\nTotal unique hosts in August 1995: {unique_hosts}")
 
 # count most frequent visitor
 most_frequent_visitor = df.groupBy("host")\
     .count()\
     .orderBy(desc("count"))\
     .limit(1)
+print("\nmost frequent visitor: ")
 most_frequent_visitor.show()
 
 spark.stop()

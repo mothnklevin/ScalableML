@@ -6,7 +6,7 @@ from pyspark.ml.feature import HashingTF, Tokenizer
 
 spark = SparkSession.builder.appName("LAB2_03_ppline").getOrCreate()
 
-print("LAB2_03_ppline")
+print("\nLAB2_03_ppline")
 
 training = spark.createDataFrame([
     (0, "a b c d e spark 6012", 1.0),
@@ -14,9 +14,8 @@ training = spark.createDataFrame([
     (2, "spark f g h 6012", 1.0),
     (3, "hadoop mapreduce", 0.0)
 ], ["id", "text", "label"])
-
-training.printSchema()
-training.show()
+# training.printSchema()
+# training.show()
 
 tokenizer = Tokenizer(inputCol="text", outputCol="words")
 hashingTF = HashingTF(inputCol=tokenizer.getOutputCol(), outputCol="features")
@@ -37,11 +36,12 @@ new_test = spark.createDataFrame([
     (6, "mapreduce spark"),
 ], ["id", "text"])
 
+print("\nshow new test set: ")
 new_test.show()
 
 prediction = model.transform(new_test)
-prediction.show()
-
+print("\nshow new prediction: ")
+# prediction.show()
 selected = prediction.select("id", "text", "probability", "prediction")
 selected.show()
 
