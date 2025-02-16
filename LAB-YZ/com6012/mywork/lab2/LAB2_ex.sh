@@ -22,5 +22,3 @@ grep -v "INFO"  /users/acw24yz/com6012/mywork/lab2/Output/COM6012_Lab2.txt > \
                 /users/acw24yz/com6012/mywork/lab2/Output/COM6012_Lab2_clean.txt
 
 echo "LAB2  completed successfully"
-
-"/users/acw24yz/com6012/mywork/lab2/Output/"
