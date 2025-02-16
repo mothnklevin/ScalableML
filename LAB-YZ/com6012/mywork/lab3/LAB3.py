@@ -1,4 +1,4 @@
-# LAB3：可扩展的Logistic回归
+# lab3：可扩展的Logistic回归
 
 # 安装 matplotlib pandas
 pip install matplotlib pandas
