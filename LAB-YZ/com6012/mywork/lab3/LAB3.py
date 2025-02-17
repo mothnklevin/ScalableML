@@ -57,6 +57,8 @@ sc._conf.getAll()
 #---
 #   1. 文件设置
 import numpy as np
+#python -c "import numpy as np; print(np.__version__)"
+
 rawdata = spark.read.csv('./Data/spambase.data')
 rawdata.cache()
 ncolumns = len(rawdata.columns)
@@ -115,7 +117,9 @@ vecAssembler = VectorAssembler(inputCols = spam_names[0:ncolumns-1], outputCol =
 #---
 # 从 Logistic 回归开始，没有正则化，所以λ=0
 from pyspark.ml.classification import LogisticRegression
-lr = LogisticRegression(featuresCol='features', labelCol='labels', maxIter=50, regParam=0, family="binomial")
+lr = LogisticRegression(featuresCol='features', \
+                        labelCol='labels', maxIter=50, \
+                        regParam=0, family="binomial")
 
 # 创建一个pipeline，并将其拟合到训练数据中
 from pyspark.ml import Pipeline
@@ -138,7 +142,8 @@ w_no_reg = pipelineModel.stages[-1].coefficients.values
 
 #---
 # 现在仅使用ℓ1正则化 （λ=0.01和α=1)
-lrL1 = LogisticRegression(featuresCol='features', labelCol='labels', maxIter=50, regParam=0.01, \
+lrL1 = LogisticRegression(featuresCol='features', labelCol='labels', \
+                          maxIter=50, regParam=0.01, \
                           elasticNetParam=1, family="binomial")
 
 # Pipeline for the second model with L1 regularisation
@@ -164,9 +169,10 @@ import matplotlib.pyplot as plt
 f, (ax1, ax2) = plt.subplots(1, 2, sharey=True)
 ax1.plot(w_no_reg)
 ax1.set_title('No regularisation')
+
 ax2.plot(w_L1)
 ax2.set_title('L1 regularisation')
-plt.savefig("Output/w_with_and_without_reg.png")
+plt.savefig("./Output/w_with_and_without_reg.png")
 
 # 看看每种方法首选哪些功能
 #---

@@ -494,7 +494,7 @@ ax1.plot(w_no_reg)
 ax1.set_title('No regularisation')
 ax2.plot(w_L1)
 ax2.set_title('L1 regularisation')
-plt.savefig("Output/w_with_and_without_reg.png")
+plt.savefig("./Output/w_with_and_without_reg.png")
 ```
 
 Let us find out which features are preferred by each method. Without regularisation, the most relevant feature is
