@@ -3,10 +3,10 @@
 # 加载数据集及其特征与标签
 # 同时缓存dataframe
 import numpy as np
-rawdata = spark.read.csv('./Data/spambase.data')
+rawdata = spark.read.csv('./assets/spambase.data')
 rawdata.cache()
 ncolumns = len(rawdata.columns)
-spam_names = [spam_names.rstrip('\n') for spam_names in open('./Data/spambase.data.names')]
+spam_names = [spam_names.rstrip('\n') for spam_names in open('./assets/spambase.data.names')]
 number_names = np.shape(spam_names)[0]
 for i in range(number_names):
     local = spam_names[i]
@@ -125,7 +125,7 @@ print("Accuracy = %g " % accuracy)
 # 现在使用随机森林来执行回归
 
 # 预测葡萄酒的品质
-rawdataw = spark.read.csv('./Data/winequality-white.csv', sep=';', header='true')
+rawdataw = spark.read.csv('./assets/winequality-white.csv', sep=';', header='true')
 rawdataw.cache()
 
 rawdataw.printSchema()
