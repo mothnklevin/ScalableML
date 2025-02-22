@@ -55,8 +55,7 @@ pipelineModel = pipeline.fit(trainingData)
 
 # 评估 RMSE
 predictions = pipelineModel.transform(testData)
-evaluator = RegressionEvaluator\
-      (labelCol="cnt", predictionCol="prediction", metricName="rmse")
+evaluator = RegressionEvaluator(labelCol="cnt", predictionCol="prediction", metricName="rmse")
 rmse = evaluator.evaluate(predictions)
 print("RMSE = %g " % rmse)
 
@@ -88,3 +87,8 @@ pipelineModel.stages[-1].coefficients
 # 线性回归使用elastic Net正则化和OWL-QN优化。
 # 线性回归使用ℓ2正则化和L-BGFS优化。
 # 线性回归使用ℓ2正则化和IRLS优化。
+
+# normal : (X转置*X)的逆矩阵 乘 X转置*Y
+# l-bfgs ：Hessian 矩阵，不会直接计算 X'X，而是逐步优化；不能用于L1，因为L1不可导
+# owl-qn ： L-BFGS 的变种，专门用于 L1
+# irls ：迭代重加权最小二乘法

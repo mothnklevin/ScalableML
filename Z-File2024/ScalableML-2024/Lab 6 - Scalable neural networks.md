@@ -1,7 +1,7 @@
 # Lab 6: Scalable neural networks
 
 
-## Study schedule
+/  ## Study schedule`
 
 - [Section 1](#1-Shallow-neural-networks-in-PySpark): To finish by by 15th March. **Essential**
 - [Section 2](#2-Keras-on-PySpark): To finish by 15th March. **Essential**
