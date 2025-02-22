@@ -1,16 +1,35 @@
 # part1. PySpark 中的 GLM
+
+from pyspark.sql.types import DoubleType
+from pyspark.ml.feature import VectorAssembler
+from pyspark.ml.regression import GeneralizedLinearRegression
+from pyspark.ml import Pipeline
+from pyspark.ml.evaluation import RegressionEvaluator
+
+
+# 加载数据 并缓存rawdata到内存
 rawdata = spark.read.csv('./assets/hour.csv', header=True)
 rawdata.cache()
 
+# 返回 rawdata 的所有列名，并存储到 schemaNames 变量中
 schemaNames = rawdata.schema.names
+# 计算 rawdata 的列数，并存储到 ncolumns 变量中
 ncolumns = len(rawdata.columns)
+# 选择 schemaNames 列表中的第三列到 ncolumns（最后一列）
+# 创建新的 DataFrame new_rawdata
 new_rawdata = rawdata.select(schemaNames[2:ncolumns])
 
 # 转换为 DoubleType
+# 获取 new_rawdata 的列名，
+# 并存储到 new_schemaNames 变量中
 new_schemaNames = new_rawdata.schema.names
-from pyspark.sql.types import DoubleType
+
 new_ncolumns = len(new_rawdata.columns)
+# 遍历 new_rawdata 的所有列
 for i in range(new_ncolumns):
+    # withColumn()将new_rawdata中的每一列转换为DoubleType（即浮点数）
+    # cast(DoubleType())确保所有列的数据类型为 Double
+    # 每次withColumn()操作都会返回一个新的DataFrame，所以需要不断更新new_rawdata
     new_rawdata = new_rawdata.withColumn(new_schemaNames[i], new_rawdata[new_schemaNames[i]].cast(DoubleType()))
 # 打印检查数据
 new_rawdata.printSchema()
@@ -21,16 +40,13 @@ new_rawdata.printSchema()
 new_schemaNames[0:new_ncolumns-3]
 
 # 将特征组装成一个向量
-from pyspark.ml.feature import VectorAssembler
 assembler = VectorAssembler(inputCols = new_schemaNames[0:new_ncolumns-3], outputCol = 'features')
 
 # 对数据集应用 Poisson 回归。
 # 使用 GeneralizedLinearRegression 模型
-from pyspark.ml.regression import GeneralizedLinearRegression
 glm_poisson = GeneralizedLinearRegression(featuresCol='features', labelCol='cnt', maxIter=50, regParam=0.01,\
                                           family='poisson', link='log')
 # 创建pipeline
-from pyspark.ml import Pipeline
 stages = [assembler, glm_poisson]
 pipeline = Pipeline(stages=stages)
 
@@ -39,7 +55,6 @@ pipelineModel = pipeline.fit(trainingData)
 
 # 评估 RMSE
 predictions = pipelineModel.transform(testData)
-from pyspark.ml.evaluation import RegressionEvaluator
 evaluator = RegressionEvaluator\
       (labelCol="cnt", predictionCol="prediction", metricName="rmse")
 rmse = evaluator.evaluate(predictions)
