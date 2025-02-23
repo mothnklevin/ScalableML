@@ -1,6 +1,7 @@
 from pyspark.sql import SparkSession
+from pyspark.sql.types import DoubleType
 from pyspark.ml.feature import OneHotEncoder, StringIndexer, VectorAssembler
-from pyspark.ml.regression import GeneralizedLinearRegression
+from pyspark.ml.regression import GeneralizedLinearRegression, LinearRegression
 from pyspark.ml.evaluation import RegressionEvaluator
 from pyspark.ml import Pipeline
 
@@ -84,12 +85,21 @@ print("ONEHOT RMSE = %g " % rmse_new)
 
 # model list
 # solver :
+# PySpark 3.x  LinearRegression removed owl-qn
+# # 1. ℓ1 （Lasso）+ OWL-QN
+# lr_l1_owlqn = LinearRegression(featuresCol="features", labelCol=label_col,
+#                                regParam=0.01, elasticNetParam=1.0, solver="owl-qn")
+# # 2. Elastic Net  + OWL-QN
+# lr_elastic_owlqn = LinearRegression(featuresCol="features", labelCol=label_col,
+#                                     regParam=0.01, elasticNetParam=0.5, solver="owl-qn")
+
 # 1. ℓ1 （Lasso）+ OWL-QN
 lr_l1_owlqn = LinearRegression(featuresCol="features", labelCol=label_col,
-                               regParam=0.01, elasticNetParam=1.0, solver="owl-qn")
+                               regParam=0.01, elasticNetParam=1.0, solver="l-bfgs")
 # 2. Elastic Net  + OWL-QN
 lr_elastic_owlqn = LinearRegression(featuresCol="features", labelCol=label_col,
-                                    regParam=0.01, elasticNetParam=0.5, solver="owl-qn")
+                                    regParam=0.01, elasticNetParam=0.5, solver="l-bfgs")
+
 # 3. ℓ2 （Ridge）+ L-BFGS
 lr_l2_lbfgs = LinearRegression(featuresCol="features", labelCol=label_col,
                                regParam=0.01, elasticNetParam=0.0, solver="l-bfgs")
