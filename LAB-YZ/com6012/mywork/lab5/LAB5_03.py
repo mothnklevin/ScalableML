@@ -9,6 +9,10 @@ from pyspark.sql.types import DoubleType
 from pyspark.sql.types import StringType
 from pyspark.ml.evaluation import RegressionEvaluator
 
+import time
+start_time = time.time()
+print("\nLAB3 START")
+
 # 创建 SparkSession
 spark = SparkSession.builder.appName("LAB5_03").getOrCreate()
 
@@ -33,8 +37,7 @@ feature_cols = [col for col in rawdataw.columns if col != 'labels']
 vecAssembler = VectorAssembler(inputCols=feature_cols, outputCol="features")
 
 # 创建随机森林回归器
-rf = RandomForestRegressor(labelCol="quality", featuresCol="features", numTrees=100)
-
+# rf = RandomForestRegressor(labelCol="quality", featuresCol="features", numTrees=100)
 rf = RandomForestRegressor(labelCol="labels", featuresCol="features", maxDepth=10, numTrees=100,
                            featureSubsetStrategy="sqrt", seed=42, bootstrap=True)
 
@@ -42,7 +45,7 @@ rf = RandomForestRegressor(labelCol="labels", featuresCol="features", maxDepth=1
 # 训练模型
 stages = [vecAssembler, rf]
 pipeline = Pipeline(stages=stages)
-model = rf.fit(trainingData)
+model = pipeline.fit(trainingData)
 
 # 预测测试数据
 predictions = model.transform(testData)
@@ -69,7 +72,7 @@ top3_features = [(feature_cols[i], imp_feat[i]) for i in sorted_indices[:3]]
 # 输出最重要的 3 个特征
 print("\ntop3 importance features: ")
 for rank, (feature, importance) in enumerate(top3_features, start=1):
-    print(f"Top {rank} 特征: {feature}, 重要性: {importance:.4f}")
+    print(f"Top {rank} feature: {feature}, importance: {importance:.4f}")
 
 # 转换为 Pandas DataFrame 并排序
 featureImp_df = pd.DataFrame(
@@ -80,6 +83,10 @@ featureImp_df = featureImp_df.sort_values(by="importance", ascending=False)
 # 打印完整特征重要性表
 print("\nall feature importance table: ")
 print(featureImp_df)
+
+end_time = time.time()
+running_time = end_time - start_time
+print(f"\nex 3 running time: {running_time:.2f} sec")
 
 # 停止 SparkSession
 spark.stop()

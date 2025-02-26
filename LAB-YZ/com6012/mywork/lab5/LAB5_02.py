@@ -8,6 +8,10 @@ import numpy as np
 from pyspark.sql.functions import col
 from pyspark.sql.types import StringType
 
+import time
+start_time = time.time()
+
+print("\nLAB2 START")
 # 创建 SparkSession
 spark = SparkSession.builder.appName("LAB5_02").getOrCreate()
 
@@ -57,9 +61,9 @@ pipeline = Pipeline(stages=[vecAssembler, rf])
 
 # 创建超参数网格
 paramGrid = (ParamGridBuilder()
-             .addGrid(rf.maxDepth, [5, 10, 15])  # 决策树最大深度
+             .addGrid(rf.maxDepth, [5, 7, 10])  # 决策树最大深度
              .addGrid(rf.maxBins, [16, 32, 64])  # 分桶数
-             .addGrid(rf.numTrees, [10, 50, 100])  # 随机森林树的数量
+             .addGrid(rf.numTrees, [50, 100, 150])  # 随机森林树的数量
              .addGrid(rf.featureSubsetStrategy, ["auto", "sqrt", "log2"])  # 选择特征的策略
              .addGrid(rf.subsamplingRate, [0.7, 1.0])  # 采样比例
              .build())
@@ -86,10 +90,14 @@ best_rf = Model.bestModel.stages[-1]  # 获取最佳的随机森林模型
 # 输出最佳参数和测试集上的准确率
 print(f"bestModel maxDepth: {best_rf.getMaxDepth()}")
 print(f"bestModel maxBins: {best_rf.getMaxBins()}")
-print(f"bestModel numTrees: {best_rf.getNumTrees()}")
+print(f"bestModel numTrees:  {best_rf.numTrees}") # Spark 3.0 later, numTrees is property
 print(f"bestModel featureSubsetStrategy: {best_rf.getFeatureSubsetStrategy()}")
 print(f"bestModel subsamplingRate: {best_rf.getSubsamplingRate()}")
 print(f"bestModel accuracy: {accuracy:.4f}")
+
+end_time = time.time()
+running_time = end_time - start_time
+print(f"\nex 2 running time: {running_time:.2f} sec")
 
 # 停止 SparkSession
 spark.stop()

@@ -8,6 +8,9 @@ import numpy as np
 from pyspark.sql.functions import col
 from pyspark.sql.types import StringType
 
+import time
+start_time = time.time()
+print("\nLAB1 START")
 
 # 创建 SparkSession
 spark = SparkSession.builder.appName("LAB5_01").getOrCreate()
@@ -88,6 +91,10 @@ print(f"bestModel maxDepth: {best_params.getMaxDepth()}")
 print(f"bestModel maxBins: {best_params.getMaxBins()}")
 print(f"bestModel impurity: {best_params.getImpurity()}")
 print(f"bestModel accuracy: {accuracy:.4f}")
+
+end_time = time.time()
+running_time = end_time - start_time
+print(f"\nex 1 running time: {running_time:.2f} sec")
 
 # 停止 SparkSession
 spark.stop()
