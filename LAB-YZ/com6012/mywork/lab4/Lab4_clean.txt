@@ -1,0 +1,27 @@
+25/03/01 02:40:58 WARN NativeCodeLoader: Unable to load native-hadoop library for your platform... using builtin-java classes where applicable
+ MapPartitionsRDD[13] at rdd at Instrumentation.scala:62), which has no missing parents
+ MapPartitionsRDD[13] at rdd at Instrumentation.scala:62) (first 15 tasks are for partitions Vector(0))
+[rdd_13_0]
+25/03/01 02:41:04 WARN InstanceBuilder: Failed to load implementation from:dev.ludovic.netlib.blas.JNIBLAS
+25/03/01 02:41:04 WARN InstanceBuilder: Failed to load implementation from:dev.ludovic.netlib.blas.VectorBLAS
+25/03/01 02:41:04 WARN InstanceBuilder: Failed to load implementation from:dev.ludovic.netlib.lapack.JNILAPACK
+original RMSE = 142.214 
+ONEHOT RMSE = 93.8597 
+
+Training model: L1 + OWL-QN (l-bfgs)
+L1 + OWL-QN (l-bfgs) RMSE = 101.7679884401
+
+Training model: Elastic Net + OWL-QN (l-bfgs)
+Elastic Net + OWL-QN (l-bfgs) RMSE = 101.7696021245
+
+Training model: L1 + OWL-QN (normal)
+L1 + OWL-QN (normal) RMSE = 101.7679885535
+
+Training model: Elastic Net + OWL-QN (normal)
+Elastic Net + OWL-QN (normal) RMSE = 101.7696021517
+
+Training model: L2 + L-BFGS
+L2 + L-BFGS RMSE = 101.7705105876
+
+Training model: L2 + IRLS
+L2 + IRLS RMSE = 93.8596741527
