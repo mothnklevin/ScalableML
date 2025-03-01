@@ -1,0 +1,26 @@
+25/03/01 01:37:05 WARN NativeCodeLoader: Unable to load native-hadoop library for your platform... using builtin-java classes where applicable
+
+EX1 START
+25/03/01 01:37:08 WARN SparkStringUtils: Truncated the string representation of a plan since it was too large. This behavior can be adjusted by setting 'spark.sql.debug.maxToStringFields'.
+ MapPartitionsRDD[13] at rdd at Instrumentation.scala:62), which has no missing parents
+ MapPartitionsRDD[13] at rdd at Instrumentation.scala:62) (first 15 tasks are for partitions Vector(0))
+[rdd_13_0]
+[rdd_19_0]
+25/03/01 01:37:14 WARN InstanceBuilder: Failed to load implementation from:dev.ludovic.netlib.blas.JNIBLAS
+25/03/01 01:37:14 WARN InstanceBuilder: Failed to load implementation from:dev.ludovic.netlib.blas.VectorBLAS
+[rdd_204_0]
+[rdd_770_0]
+[rdd_956_0]
+[rdd_1563_0]
+25/03/01 01:37:54 ERROR StrongWolfeLineSearch: Encountered bad values in function evaluation. Decreasing step size to 0.5
+[rdd_1772_0]
+best parameters (layers): [57, 10, 2]
+best parameters: MultilayerPerceptronClassifier_d48353f9d407__layers
+best accuracy: 0.9231
+
+ex 1 running time: 66.87 sec
+
+EX2 START
+Scikit-learn RandomForest Accuracy: 0.9528
+
+ex 2 running time: 3.27 sec
