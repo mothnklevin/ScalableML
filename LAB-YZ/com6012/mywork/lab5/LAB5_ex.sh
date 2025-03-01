@@ -21,7 +21,7 @@ spark-submit --driver-memory 6g --executor-memory 5g --master local[4] ./LAB5_02
 spark-submit --driver-memory 6g --executor-memory 5g --master local[4] ./LAB5_03.py
 
 
-grep -v -E "INFO|rdd_[0-9]+|WARN DAGScheduler"  \
+grep -v -E "INFO|rdd_[0-9]+|WARN DAGScheduler|total:|findBestSplits:|chooseSplits:"  \
                 /users/acw24yz/com6012/mywork/Output/Lab5.txt > \
                 /users/acw24yz/com6012/mywork/Output/Lab5_clean.txt
 

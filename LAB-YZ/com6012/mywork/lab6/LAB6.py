@@ -12,6 +12,7 @@ import numpy as np
 rawdata = spark.read.csv('./Data/spambase.data')
 rawdata.cache()
 ncolumns = len(rawdata.columns)
+
 spam_names = [spam_names.rstrip('\n') for spam_names in open('./Data/spambase.data.names')]
 number_names = np.shape(spam_names)[0]
 for i in range(number_names):
@@ -108,21 +109,22 @@ model.compile(optimizer='rmsprop', loss='binary_crossentropy', metrics=['accurac
 # 使用 20% 的训练数据对数据进行拟合以进行验证
 history = model.fit(Xtrain, ytrain, epochs=100, batch_size=100, validation_split=0.2, verbose=False)
 
-# 绘制训练进度图
-import matplotlib.pyplot as plt
-
-history_dict = history.history
-acc_values= history_dict['accuracy']
-val_acc_values= history_dict['val_accuracy']
-epochs = range(1, len(acc_values)+1)
-
-plt.plot(epochs, acc_values, 'bo', label='Training acc')
-plt.plot(epochs, val_acc_values, 'b', label='Validation acc')
-plt.title('Training and validation accuracy')
-plt.xlabel('Epochs')
-plt.ylabel('Accuracy')
-plt.legend()
-plt.savefig("./Output/keras_nn_train_validation_history.png")
+# # 可视化
+# # 绘制训练进度图
+# import matplotlib.pyplot as plt
+#
+# history_dict = history.history
+# acc_values= history_dict['accuracy']
+# val_acc_values= history_dict['val_accuracy']
+# epochs = range(1, len(acc_values)+1)
+#
+# plt.plot(epochs, acc_values, 'bo', label='Training acc')
+# plt.plot(epochs, val_acc_values, 'b', label='Validation acc')
+# plt.title('Training and validation accuracy')
+# plt.xlabel('Epochs')
+# plt.ylabel('Accuracy')
+# plt.legend()
+# plt.savefig("./Output/keras_nn_train_validation_history.png")
 
 
 
@@ -155,12 +157,13 @@ class ModelWrapperPickable:
             fd.flush()
             self.model = tensorflow.keras.models.load_model(fd.name)
 
-# 使用类ModelWrapperPickable
+# 使用类ModelWrapperPickable封装 Keras 模型
 model_wrapper = ModelWrapperPickable(model)
 
 # 此处 mapInPandas（）返回一个具有相同列特征的 DataFrame 和一个用于预测的附加列
 
-# 从仅包含特征的数据帧中提取testData
+
+# 从仅包含特征的数据帧中提取testData ，不包含 labels
 Xtest = testData.select(spam_names[0:ncolumns-1])
 
 # 输出数据帧的新架构
