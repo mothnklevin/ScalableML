@@ -107,10 +107,21 @@ lr_l2_lbfgs = LinearRegression(featuresCol="features", labelCol=label_col,
 glm_l2_irls = GeneralizedLinearRegression(featuresCol="features", labelCol=label_col,
                                           regParam=0.01, family="poisson", link="log", solver="irls")
 
+# 5. ℓ1 （Lasso）+ OWL-QN
+lr_l1_owlqn_normal = LinearRegression(featuresCol="features", labelCol=label_col,
+                               regParam=0.01, elasticNetParam=1.0, solver="normal")
+# 6. Elastic Net  + OWL-QN
+lr_elastic_owlqn_normal = LinearRegression(featuresCol="features", labelCol=label_col,
+                                    regParam=0.01, elasticNetParam=0.5, solver="normal")
+
 
 models = {
-    "L1 + OWL-QN": lr_l1_owlqn,
-    "Elastic Net + OWL-QN": lr_elastic_owlqn,
+    "L1 + OWL-QN (l-bfgs)": lr_l1_owlqn,
+    "Elastic Net + OWL-QN (l-bfgs)": lr_elastic_owlqn,
+
+    "L1 + OWL-QN (normal)": lr_l1_owlqn_normal,
+    "Elastic Net + OWL-QN (normal)": lr_elastic_owlqn_normal,
+
     "L2 + L-BFGS": lr_l2_lbfgs,
     "L2 + IRLS": glm_l2_irls
 }
@@ -132,7 +143,7 @@ for name, model in models.items():
 
     # 计算 RMSE
     rmse = evaluator.evaluate(predictions)
-    print(f"{name} RMSE = {rmse:.4f}")
+    print(f"{name} RMSE = {rmse:.10f}")
 
 
 spark.stop()
