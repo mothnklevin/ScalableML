@@ -29,11 +29,11 @@ parts = lines.map(lambda row: row.value.split("\t"))
 ratingsRDD = parts.map(lambda p: Row(userId=int(p[0]), movieId=int(p[1]),rating=float(p[2]), timestamp=int(p[3])))
 ratings = spark.createDataFrame(ratingsRDD).cache()
 
-# 检查数据
-ratings.show(5)
-
-# 检查数据类型：
-ratings.printSchema()
+# # 检查数据
+# ratings.show(5)
+#
+# # 检查数据类型：
+# ratings.printSchema()
 
 # 准备训练/测试数据
 myseed=6012
@@ -51,6 +51,7 @@ model = als.fit(training)
 predictions = model.transform(test)
 evaluator = RegressionEvaluator(metricName="rmse", labelCol="rating",predictionCol="prediction")
 rmse = evaluator.evaluate(predictions)
+
 print("Root-mean-square error = " + str(rmse))
 # # Root-mean-square error = 0.9209573069829078
 
@@ -66,14 +67,12 @@ movieRecs.show(5, False)
 users = ratings.select(als.getUserCol()).distinct().limit(3)
 userSubsetRecs = model.recommendForUserSubset(users, 10)
 users.show()
-
 userSubsetRecs.show(3,False)
 
 # 为一组指定的电影生成前 10 名用户推荐
 movies = ratings.select(als.getItemCol()).distinct().limit(3)
 movieSubSetRecs = model.recommendForItemSubset(movies, 10)
 movies.show()
-
 movieSubSetRecs.show(3,False)
 
 
@@ -93,7 +92,7 @@ dfItemFactors.show()
 # 2. 使用ALS在此数据集上学习五个推荐模型，
 # 使用与上述相同的拆分比率 （0.8, 0.2） 和 seed（6012），
 # 但rank参数使用五个不同值：5、10、15、20、25。
-# 将 5 个生成的 RMSE 值（在测试集上）与 5 个排名值作图。
+# 将 5 个生成的 RMSE 值（在测试集上）与 5 个rating值作图。
 #
 #
 # 3. 找到要推荐给您选择的任何一个用户的前五部电影，
