@@ -1,24 +1,31 @@
 from pyspark.ml.evaluation import RegressionEvaluator
 from pyspark.ml.recommendation import ALS
 from pyspark.sql import SparkSession, Row
+from pyspark.sql.types import StructType, StructField, IntegerType, FloatType, StringType
+
 import matplotlib.pyplot as plt
 
 # 初始化 Spark 会话
 spark = SparkSession.builder.appName("LAB7_02").getOrCreate()
+print("LAB7_02 start")
 
-# 读入数据并拆分单词（逗号分隔）
-lines = spark.read.text("Data/ml-latest-small/ratings.csv").rdd
-parts = lines.map(lambda row: row.value.split(","))
+schema_ratings = StructType([
+    StructField("userId", IntegerType(), True),
+    StructField("movieId", IntegerType(), True),
+    StructField("rating", FloatType(), True),
+    StructField("timestamp", IntegerType(), True)
+])
+# 读取 CSV 文件并应用 Schema
+ratings = spark.read.csv("Data/ml-latest-small/ratings.csv", header=True, schema=schema_ratings).cache()
 
-# 手动指定数据格式并转换为 DataFrame（去除 timestamp 列）
-ratingsRDD = parts.map(lambda p: Row(userId=int(p[0]), movieId=int(p[1]), rating=float(p[2])))
-ratings = spark.createDataFrame(ratingsRDD).cache()
-
+schema_movies = StructType([
+    StructField("movieId", IntegerType(), True),
+    StructField("title", StringType(), True),
+    StructField("genres", StringType(), True)
+])
 # 读取电影数据 movies.csv
-movies_lines = spark.read.text("Data/ml-latest-small/movies.csv").rdd
-movies_parts = movies_lines.map(lambda row: row.value.split(","))
-moviesRDD = movies_parts.map(lambda p: Row(movieId=int(p[0]), title=p[1], genres=p[2]))
-movies = spark.createDataFrame(moviesRDD).cache()
+movies = spark.read.csv("Data/ml-latest-small/movies.csv", header=True, schema=schema_movies).cache()
+
 
 # 准备训练/测试数据
 myseed = 6012
@@ -48,8 +55,10 @@ recommended_movies = movies.filter(movies.movieId.isin(recommended_movie_ids))
 recommended_movies_list = recommended_movies.select("title", "genres").collect()
 
 # 打印用户 ID 和推荐的电影信息
-print(f"推荐给用户 {selected_user} 的前 5 部电影:")
+print(f"TOP 5 MOVIES for user {selected_user}  :")
 for movie in recommended_movies_list:
-    print(f"电影: {movie['title']}, 类型: {movie['genres']}")
+    print(f"movie: {movie['title']}, genres: {movie['genres']}")
+
+print("LAB7_02  end")
 
 spark.stop()

@@ -29,6 +29,7 @@ parts = lines.map(lambda row: row.value.split("\t"))
 ratingsRDD = parts.map(lambda p: Row(userId=int(p[0]), movieId=int(p[1]),rating=float(p[2]), timestamp=int(p[3])))
 ratings = spark.createDataFrame(ratingsRDD).cache()
 
+
 # # 检查数据
 # ratings.show(5)
 #

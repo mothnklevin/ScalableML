@@ -76,9 +76,6 @@ model2.hasSummary
 model2.clusterCenters()
 # [array([0.5, 0.5]), array([8.5, 8.5])]
 
-
-
-
 # 鸢尾花聚类
 
 # 加载和检查数据

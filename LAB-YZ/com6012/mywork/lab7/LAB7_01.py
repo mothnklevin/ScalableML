@@ -1,18 +1,22 @@
 from pyspark.ml.evaluation import RegressionEvaluator
 from pyspark.ml.recommendation import ALS
 from pyspark.sql import SparkSession, Row
+from pyspark.sql.types import StructType, StructField, IntegerType, FloatType
 import matplotlib.pyplot as plt
 
 # 初始化 Spark 会话
 spark = SparkSession.builder.appName("LAB7_01").getOrCreate()
+print("LAB7_01 start")
 
-# 读入数据并拆分单词（逗号分隔）
-lines = spark.read.text("Data/ml-latest-small/ratings.csv").rdd
-parts = lines.map(lambda row: row.value.split(","))
+schema_ratings = StructType([
+    StructField("userId", IntegerType(), True),
+    StructField("movieId", IntegerType(), True),
+    StructField("rating", FloatType(), True),
+    StructField("timestamp", IntegerType(), True)
+])
 
-# 手动指定数据格式并转换为 DataFrame
-ratingsRDD = parts.map(lambda p: Row(userId=int(p[0]), movieId=int(p[1]), rating=float(p[2]), timestamp=int(p[3])))
-ratings = spark.createDataFrame(ratingsRDD).cache()
+# 读取 CSV 文件并应用 Schema
+ratings = spark.read.csv("Data/ml-latest-small/ratings.csv", header=True, schema=schema_ratings).cache()
 
 # 准备训练/测试数据
 myseed = 6012
@@ -45,5 +49,7 @@ plt.title("Rank - RMSE")
 plt.grid()
 plt.savefig("RMSEvsRank.PNG")
 plt.show()
+
+print("LAB7_01 end")
 
 spark.stop()
